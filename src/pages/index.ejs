@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://pro.fontawesome.com/releases/v5.13.1/css/all.css" rel="stylesheet"> 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    <title>Online Taş Kağıt Makas</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+  <div class="container">
+    <div class="SkorTablosu card m-t">
+      <div class="card-body text-center">
+      <label id="team1">0</label> - <label id="team2">0</label>
+      </div>
+    </div>
+    <div class="row justify-content-center m-t">
+     <form class="col-md-4" id="tas" action="">
+       <center>
+        <button class="btn" type="submit"><i class="fas fa-hand-rock"></i></button>
+       </center>
+    </form>
+       <form class="col-md-4" id="kagit" action="">
+      <center>
+        <button class="btn" type="submit"><i class="fas fa-hand-paper"></i></button>
+         </center>
+    </form>
+       <form class="col-md-4" id="makas" action="">
+           <center>
+        <button class="btn" type="submit"><i class="fas fa-hand-scissors"></i></button>
+         </center>
+    </form>
+    
+    <form id="bitir" action="">
+      <button class="btn btn-dark m-t" type="submit">Turu bitir</button>
+    </form>
+    </div>
+    <h4 id="mesaj"></h4>
+  </div>
+
+   <script src="/socket.io/socket.io.js"></script>
+    <script>
+    let socket = io();
+      
+      let username = "<%= user.username %>";
+      let team = "<%= user.team %>";
+      
+      let team1_Secim = "";
+      let team2_Secim = "";
+      
+      let team1_Skor = 0;
+      let team2_Skor = 0;
+      
+      let team1_SkorTablosu = document.getElementById("team1")
+      let team2_SkorTablosu = document.getElementById("team2")
+      
+      let tas = document.getElementById("tas");
+      let kagit = document.getElementById("kagit");
+      let makas = document.getElementById("makas");
+      
+      let bitir = document.getElementById("bitir");
+      
+      let kisaMesaj = document.getElementById("mesaj");
+      
+      tas.addEventListener("submit", function(e){
+      e.preventDefault();
+      if(team == "team1"){
+       socket.emit("team1-tas", username)
+      } else {
+       socket.emit("team2-tas", username) 
+      }
+      })
+      
+      kagit.addEventListener("submit", function(e){
+       e.preventDefault();
+       if(team == "team1"){
+       socket.emit("team1-kagit", username)  
+       } else {
+       socket.emit("team2-kagit", username)  
+       }
+      })
+      
+      makas.addEventListener("submit", function(e){
+       e.preventDefault();
+       if(team == "team1"){
+       socket.emit("team1-makas", username)  
+       } else {
+       socket.emit("team2-makas", username)  
+       }
+      })
+      // Sonucu Göster
+      bitir.addEventListener("submit", function(e){
+       e.preventDefault();
+       if(team1_Secim == "taş" && team2_Secim == "taş"){
+         socket.emit("beraberlik", username)
+       } if(team1_Secim == "kağıt" && team2_Secim == "kağıt"){
+         socket.emit("beraberlik", username)
+       } if (team1_Secim == "makas" && team2_Secim == "makas"){
+         socket.emit("beraberlik", username)
+       } if(team1_Secim == "taş" && team2_Secim == "kağıt"){
+         socket.emit("team2-galibiyet", username)
+       } if(team1_Secim == "kağıt" && team2_Secim == "makas"){
+         socket.emit("team2-galibiyet", username)
+       } if(team1_Secim == "makas" && team2_Secim == "taş"){
+         socket.emit("team2-galibiyet", username)
+       } if(team1_Secim == "kağıt" && team2_Secim == "taş"){
+         socket.emit("team1-galibiyet", username)
+       } if(team1_Secim == "makas" && team2_Secim == "kağıt"){
+         socket.emit("team1-galibiyet", username)
+       } if(team1_Secim == "taş" && team2_Secim == "makas"){
+         socket.emit("team1-galibiyet", username)
+       }
+      })
+      //Takımlar ve Seçimler
+
+      socket.on("team1-tas", (data)=>{
+      team1_Secim = "taş";
+      kisaMesaj.innerHTML = "Takım 1 seçimini yaptı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      })
+      
+      socket.on("team2-tas", (data)=>{
+      team2_Secim =  "taş";
+      kisaMesaj.innerHTML = "Takım 2 seçimini yaptı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      })
+      
+      socket.on("team1-kagit", (data)=>{
+      kisaMesaj.innerHTML = "Takım 1 seçimini yaptı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      team1_Secim = "kağıt";
+      })
+      
+      socket.on("team2-kagit", (data)=>{
+      kisaMesaj.innerHTML = "Takım 2 seçimini yaptı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      team2_Secim = "kağıt";
+      })
+      
+      socket.on("team1-makas", (data)=>{
+      kisaMesaj.innerHTML = "Takım 1 seçimini yaptı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      team1_Secim = "makas";
+      })
+      
+      socket.on("team2-makas", (data)=>{
+      kisaMesaj.innerHTML = "Takım 2 seçimini yaptı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      team2_Secim = "makas";
+      })
+      //Durumlar
+      socket.on("beraberlik", (data)=>{
+      kisaMesaj.innerHTML = "Beraberlik";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      })
+      socket.on("team1-galibiyet", (data)=>{
+      kisaMesaj.innerHTML = "Takım 1 Kazandı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      team1_Skor++
+      team1_SkorTablosu.innerHTML = team1_Skor
+      return team1_Skor
+      })
+      socket.on("team2-galibiyet",(data)=>{
+      kisaMesaj.innerHTML = "Takım 2 Kazandı";
+      setTimeout(()=>{
+      kisaMesaj.innerHTML = "";  
+      },2000)
+      team2_Skor++
+      team2_SkorTablosu.innerHTML = team2_Skor
+      return team2_Skor
+      })
+
+
+
+    </script>
+  </body>
+</html>
